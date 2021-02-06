@@ -1,0 +1,12 @@
+{
+  "workbench.colorCustomizations": {
+    "editor.background": "#100010",
+    "sideBar.background": "#100010"
+  },
+  "editor.formatOnSave": true,
+  "git.ignoreLimitWarning": true,
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
