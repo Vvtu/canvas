@@ -10,10 +10,20 @@ type Coordinate = {
 };
 
 const Canvas = ({ width, height }: CanvasProps) => {
-  const canvasRef = useRef < HTMLCanvasElement > null;
+  const canvasRef = useRef();
   const [isPainting, setIsPainting] = useState(false);
-  const [mousePosition, setMousePosition] =
-    (useState < Coordinate) | (undefined > undefined);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const getCoordinates = (event: MouseEvent): Coordinate | undefined => {
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    return {
+      x: event.pageX - canvas.offsetLeft,
+      y: event.pageY - canvas.offsetTop,
+    };
+  };
 
   const startPaint = useCallback((event: MouseEvent) => {
     const coordinates = getCoordinates(event);
@@ -76,18 +86,6 @@ const Canvas = ({ width, height }: CanvasProps) => {
     };
   }, [exitPaint]);
 
-  const getCoordinates = (event: MouseEvent): Coordinate | undefined => {
-    if (!canvasRef.current) {
-      return;
-    }
-
-    const canvas: HTMLCanvasElement = canvasRef.current;
-    return {
-      x: event.pageX - canvas.offsetLeft,
-      y: event.pageY - canvas.offsetTop,
-    };
-  };
-
   const drawLine = (
     originalMousePosition: Coordinate,
     newMousePosition: Coordinate
@@ -100,7 +98,7 @@ const Canvas = ({ width, height }: CanvasProps) => {
     if (context) {
       context.strokeStyle = "red";
       context.lineJoin = "round";
-      context.lineWidth = 5;
+      context.lineWidth = 2;
 
       context.beginPath();
       context.moveTo(originalMousePosition.x, originalMousePosition.y);
@@ -112,11 +110,6 @@ const Canvas = ({ width, height }: CanvasProps) => {
   };
 
   return <canvas ref={canvasRef} height={height} width={width} />;
-};
-
-Canvas.defaultProps = {
-  width: window.innerWidth,
-  height: window.innerHeight,
 };
 
 export default Canvas;
