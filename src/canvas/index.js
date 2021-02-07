@@ -148,14 +148,34 @@ const Canvas = ({ width, height }: CanvasProps) => {
       const from = toReal(point1);
       const to = toReal(point2);
       context.moveTo(from.x, from.y);
+      context.arc(from.x, from.y, 3, 0, Math.PI * 2, true);
+      context.moveTo(from.x, from.y);
       context.lineTo(to.x, to.y);
+      context.moveTo(to.x, to.y);
+      context.arc(to.x, to.y, 3, 0, Math.PI * 2, true);
+
       context.closePath();
       context.stroke();
+
+      context.font = "1.5rem serif";
+
+      context.fillStyle = "red";
+      context.fillText(
+        `(${point1.x.toFixed(2)}, ${point1.y.toFixed(2)} )`,
+        from.x + 20,
+        from.y
+      );
+      context.fillText(
+        `(${point2.x.toFixed(2)}, ${point2.y.toFixed(2)} )`,
+        to.x + 20,
+        to.y
+      );
     }
   }, [point1, point2, toReal]);
 
   return (
     <>
+      <div>{`( ( ${point2.x.toFixed(2)}, ${point2.y.toFixed(2)} ) `}</div>
       <div
         style={{
           position: "fixed",
