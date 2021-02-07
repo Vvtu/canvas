@@ -38,32 +38,31 @@ const Canvas = ({ width, height }: CanvasProps) => {
     [height, width]
   );
 
-  const updateLineWithNewCoordinates = useCallback(
-    (event: MouseEvent): Coordinate | undefined => {
-      if (!canvasRef.current) {
-        return;
-      }
-      if (isPainting === false) {
-        return;
-      }
-      const canvas: HTMLCanvasElement = canvasRef.current;
+  const updateLineWithNewCoordinates = (
+    event: MouseEvent
+  ): Coordinate | undefined => {
+    if (!canvasRef.current) {
+      return;
+    }
+    if (isPainting === false) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
 
-      const coordinate = fromReal({
-        x: event.pageX - canvas.offsetLeft,
-        y: event.pageY - canvas.offsetTop,
-      });
-      const d1 = distance(coordinate, point1);
-      const d2 = distance(coordinate, point2);
-      if (d1 < d2 && d1 < 1) {
-        setPoint1(coordinate);
-      } else {
-        if (d2 < d1 && d2 < 1) {
-          setPoint2(coordinate);
-        }
+    const coordinate = fromReal({
+      x: event.pageX - canvas.offsetLeft,
+      y: event.pageY - canvas.offsetTop,
+    });
+    const d1 = distance(coordinate, point1);
+    const d2 = distance(coordinate, point2);
+    if (d1 < d2 && d1 < 1) {
+      setPoint1(coordinate);
+    } else {
+      if (d2 < d1 && d2 < 1) {
+        setPoint2(coordinate);
       }
-    },
-    [fromReal, isPainting, point1, point2]
-  );
+    }
+  };
 
   const mouseUp = () => setIsPainting(false);
   const mouseDown = () => setIsPainting(true);
@@ -83,7 +82,7 @@ const Canvas = ({ width, height }: CanvasProps) => {
       canvas.removeEventListener("mouseup", mouseUp);
       // canvas.removeEventListener("mouseleave", mouseDown);
     };
-  }, [updateLineWithNewCoordinates, setIsPainting]);
+  });
 
   useEffect(() => {
     if (!canvasRefBase.current) {
