@@ -1,4 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+
+const COLOR = {
+  line: "red",
+  base: "#ddd",
+  ordinates: "#000",
+};
 interface CanvasProps {
   width: number;
   height: number;
@@ -12,11 +18,32 @@ type Coordinate = {
 const distance = (a: Coordinate, b: Coordinate) =>
   Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 
+const roundPointValue = (point: Coordinate) => {
+  const p1 = { ...point };
+  const a = Math.round(p1.x);
+  let isChanged = false;
+  if (Math.abs(a - p1.x) < 0.1) {
+    p1.x = a;
+    isChanged = true;
+  }
+  const b = Math.round(p1.y);
+  if (Math.abs(b - p1.y) < 0.1) {
+    p1.y = b;
+    isChanged = true;
+  }
+  if (isChanged) {
+    return p1;
+  }
+  return point;
+};
+
 const SCALE = 60;
 
 const Canvas = ({ width, height }: CanvasProps) => {
   const canvasRef = useRef();
   const canvasRefBase = useRef();
+
+  const timeoutId = useRef();
 
   const [isPainting, setIsPainting] = useState(false);
 
@@ -37,6 +64,14 @@ const Canvas = ({ width, height }: CanvasProps) => {
     }),
     [height, width]
   );
+
+  useEffect(() => {
+    return () => {
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current);
+      }
+    };
+  }, []);
 
   const updateLineWithNewCoordinates = (
     event: MouseEvent
@@ -62,6 +97,14 @@ const Canvas = ({ width, height }: CanvasProps) => {
         setPoint2(coordinate);
       }
     }
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+    }
+
+    timeoutId.current = setTimeout(() => {
+      setPoint1(roundPointValue(point1));
+      setPoint2(roundPointValue(point2));
+    }, 300);
   };
 
   const mouseUp = () => setIsPainting(false);
@@ -91,7 +134,7 @@ const Canvas = ({ width, height }: CanvasProps) => {
     const canvasBase: HTMLCanvasElement = canvasRefBase.current;
     const contextBase = canvasBase.getContext("2d");
     if (contextBase) {
-      contextBase.strokeStyle = "#333";
+      contextBase.strokeStyle = COLOR.base;
       contextBase.lineWidth = 1;
 
       contextBase.beginPath();
@@ -115,7 +158,7 @@ const Canvas = ({ width, height }: CanvasProps) => {
       contextBase.closePath();
       contextBase.stroke();
 
-      contextBase.strokeStyle = "#555";
+      contextBase.strokeStyle = COLOR.ordinates;
       contextBase.lineWidth = 1;
       contextBase.beginPath();
       const from = toReal({ x: -lines, y: 0 });
@@ -141,18 +184,19 @@ const Canvas = ({ width, height }: CanvasProps) => {
     if (context) {
       context.clearRect(0, 0, canvas.width, canvas.height);
 
-      context.strokeStyle = "red";
-      context.lineWidth = 1;
+      context.strokeStyle = COLOR.line;
+      context.lineWidth = 3;
       context.beginPath();
 
       const from = toReal(point1);
       const to = toReal(point2);
       context.moveTo(from.x, from.y);
       context.arc(from.x, from.y, 3, 0, Math.PI * 2, true);
-      context.moveTo(from.x, from.y);
-      context.lineTo(to.x, to.y);
       context.moveTo(to.x, to.y);
       context.arc(to.x, to.y, 3, 0, Math.PI * 2, true);
+
+      context.moveTo(from.x, from.y);
+      context.lineTo(to.x, to.y);
 
       context.closePath();
       context.stroke();
@@ -162,20 +206,38 @@ const Canvas = ({ width, height }: CanvasProps) => {
       context.fillStyle = "red";
       context.fillText(
         `(${point1.x.toFixed(2)}, ${point1.y.toFixed(2)} )`,
-        from.x + 20,
-        from.y
+        from.x + 15,
+        from.y - 5
       );
       context.fillText(
         `(${point2.x.toFixed(2)}, ${point2.y.toFixed(2)} )`,
-        to.x + 20,
-        to.y
+        to.x + 15,
+        to.y - 5
       );
     }
   }, [point1, point2, toReal]);
 
+  const dx = point2.x - point1.x;
+  const dy = point2.y - point1.y;
+
+  let message;
+  if (dx === 0 && dy === 0) {
+    message = "точки совпадают";
+  } else {
+    if (dx === 0) {
+      message = "k = ∞";
+    } else {
+      const k = dy / dx;
+      const b = -point1.x * k + point1.y;
+      message = `y = ${k.toFixed(2)} * x${
+        b === 0 ? "" : ` ${b > 0 ? "+" : ""} ${b.toFixed(2)}`
+      }`;
+    }
+  }
+
   return (
     <>
-      <div>{`( ( ${point2.x.toFixed(2)}, ${point2.y.toFixed(2)} ) `}</div>
+      <div style={{ marginLeft: "15rem", fontSize: "2rem" }}>{message}</div>
       <div
         style={{
           position: "fixed",
