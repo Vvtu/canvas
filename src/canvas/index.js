@@ -18,6 +18,9 @@ type Coordinate = {
 const distance = (a: Coordinate, b: Coordinate) =>
   Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 
+const fixedValue = (x: number) =>
+  Number.isInteger(x) ? x.toFixed(1) : x.toFixed(2);
+
 const roundPointValue = (point: Coordinate) => {
   const p1 = { ...point };
   const a = Math.round(p1.x);
@@ -89,10 +92,10 @@ const Canvas = ({ width, height }: CanvasProps) => {
     });
     const d1 = distance(coordinate, point1);
     const d2 = distance(coordinate, point2);
-    if (d1 < d2 && d1 < 1) {
+    if (d1 < d2 && d1 < 1.0) {
       setPoint1(coordinate);
     } else {
-      if (d2 < d1 && d2 < 1) {
+      if (d2 < d1 && d2 < 1.0) {
         setPoint2(coordinate);
       }
     }
@@ -200,16 +203,16 @@ const Canvas = ({ width, height }: CanvasProps) => {
       context.closePath();
       context.stroke();
 
-      context.font = "1.5rem serif";
+      context.font = "1.5rem sans-serif";
 
       context.fillStyle = "red";
       context.fillText(
-        `(${point1.x.toFixed(2)}, ${point1.y.toFixed(2)} )`,
+        `(${fixedValue(point1.x)}, ${fixedValue(point1.y)} )`,
         from.x + 15,
         from.y - 5
       );
       context.fillText(
-        `(${point2.x.toFixed(2)}, ${point2.y.toFixed(2)} )`,
+        `(${fixedValue(point2.x)}, ${fixedValue(point2.y)} )`,
         to.x + 15,
         to.y - 5
       );
@@ -228,8 +231,8 @@ const Canvas = ({ width, height }: CanvasProps) => {
     } else {
       const k = dy / dx;
       const b = -point1.x * k + point1.y;
-      message = `y = ${k.toFixed(2)} * x${
-        b === 0 ? "" : ` ${b > 0 ? "+" : ""} ${b.toFixed(2)}`
+      message = `y = ${fixedValue(k)} * x${
+        b === 0 ? "" : ` ${b > 0 ? "+" : ""} ${fixedValue(b)}`
       }`;
     }
   }

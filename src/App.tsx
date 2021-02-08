@@ -15,10 +15,9 @@ function App() {
     timeoutId.current = setTimeout(() => {
       if (ref.current) {
         const rect = ref.current.getBoundingClientRect();
-        console.log("rect = ", rect); //TODO vvtu, need to delete
         setScreenSize({ width: rect.width, height: rect.height });
       }
-    }, 250);
+    }, 200);
   }
 
   useLayoutEffect(() => {
