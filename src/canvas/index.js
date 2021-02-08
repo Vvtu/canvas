@@ -1,44 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const COLOR = {
-  line: "red",
-  base: "#ddd",
-  ordinates: "#000",
-};
+import {
+  COLOR,
+  ICoordinate,
+  distance,
+  fixedValue,
+  roundPointValue,
+} from "../utils";
 interface CanvasProps {
   width: number;
   height: number;
 }
-
-type Coordinate = {
-  x: number,
-  y: number,
-};
-
-const distance = (a: Coordinate, b: Coordinate) =>
-  Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
-
-const fixedValue = (x: number) =>
-  Number.isInteger(x) ? x.toFixed(1) : x.toFixed(2);
-
-const roundPointValue = (point: Coordinate) => {
-  const p1 = { ...point };
-  const a = Math.round(p1.x);
-  let isChanged = false;
-  if (Math.abs(a - p1.x) < 0.1) {
-    p1.x = a;
-    isChanged = true;
-  }
-  const b = Math.round(p1.y);
-  if (Math.abs(b - p1.y) < 0.2) {
-    p1.y = b;
-    isChanged = true;
-  }
-  if (isChanged) {
-    return p1;
-  }
-  return point;
-};
 
 const SCALE = 60;
 
@@ -53,14 +25,14 @@ const Canvas = ({ width, height }: CanvasProps) => {
   const [point2, setPoint2] = useState({ x: 2, y: 2 });
 
   const toReal = useCallback(
-    ({ x, y }: Coordinate) => ({
+    ({ x, y }: ICoordinate) => ({
       x: x * SCALE + width / 2,
       y: -y * SCALE + height / 2,
     }),
     [height, width]
   );
   const fromReal = useCallback(
-    ({ x, y }: Coordinate) => ({
+    ({ x, y }: ICoordinate) => ({
       x: (x - width / 2) / SCALE,
       y: -(y - height / 2) / SCALE,
     }),
@@ -77,7 +49,7 @@ const Canvas = ({ width, height }: CanvasProps) => {
 
   const updateLineWithNewCoordinates = (
     event: MouseEvent
-  ): Coordinate | undefined => {
+  ): ICoordinate | undefined => {
     if (!canvasRef.current) {
       return;
     }
@@ -120,18 +92,14 @@ const Canvas = ({ width, height }: CanvasProps) => {
     canvas.addEventListener("mousedown", mouseDown);
     canvas.addEventListener("mousemove", updateLineWithNewCoordinates);
     canvas.addEventListener("mouseup", mouseUp);
-    // canvas.addEventListener("mouseleave", mouseDown);
-
     canvas.addEventListener("touchstart", mouseDown);
     canvas.addEventListener("touchend", mouseUp);
-    // canvas.addEventListener("touchcancel", handleCancel, false);
     canvas.addEventListener("touchmove", updateLineWithNewCoordinates);
 
     return () => {
       canvas.removeEventListener("mousedown", mouseDown);
       canvas.removeEventListener("mousemove", updateLineWithNewCoordinates);
       canvas.removeEventListener("mouseup", mouseUp);
-
       canvas.removeEventListener("touchstart", mouseDown);
       canvas.removeEventListener("touchend", mouseUp);
       canvas.removeEventListener("touchmove", updateLineWithNewCoordinates);
