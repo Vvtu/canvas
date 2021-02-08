@@ -6,6 +6,7 @@ import {
   distance,
   fixedValue,
   roundPointValue,
+  intersectionPoint,
 } from "../utils";
 interface CanvasProps {
   width: number;
@@ -121,7 +122,6 @@ const Canvas = ({ width, height }: CanvasProps) => {
       const lines = Math.round(
         Math.max(canvasBase.height, canvasBase.width) / SCALE / 2
       );
-      console.log("lines = ", lines); //TODO vvtu, need to delete
       for (let x = -lines; x < lines; x += 1) {
         const from = toReal({ x, y: 0 });
         const to = toReal({ x, y: 0 });
@@ -181,13 +181,32 @@ const Canvas = ({ width, height }: CanvasProps) => {
 
       const from = toReal(point1);
       const to = toReal(point2);
+
       context.moveTo(from.x, from.y);
       context.arc(from.x, from.y, 3, 0, Math.PI * 2, true);
       context.moveTo(to.x, to.y);
       context.arc(to.x, to.y, 3, 0, Math.PI * 2, true);
 
-      context.moveTo(from.x, from.y);
-      context.lineTo(to.x, to.y);
+      let p1 = intersectionPoint(
+        { p1: from, p2: to },
+        { p1: { x: 0, y: 0 }, p2: { x: 0, y: canvas.height } }
+      );
+      let p2 = intersectionPoint(
+        { p1: from, p2: to },
+        {
+          p1: { x: canvas.width, y: 0 },
+          p2: { x: canvas.width, y: canvas.height },
+        }
+      );
+
+      if (p1.x === undefined || p2.x === undefined) {
+        // прямая расположена вертикально
+        p1 = { x: from.x, y: 0 };
+        p2 = { x: from.x, y: canvas.height };
+      }
+
+      context.moveTo(p1.x, p1.y);
+      context.lineTo(p2.x, p2.y);
 
       context.closePath();
       context.stroke();
