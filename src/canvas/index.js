@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const COLOR = {
   line: "red",
@@ -27,7 +27,7 @@ const roundPointValue = (point: Coordinate) => {
     isChanged = true;
   }
   const b = Math.round(p1.y);
-  if (Math.abs(b - p1.y) < 0.1) {
+  if (Math.abs(b - p1.y) < 0.2) {
     p1.y = b;
     isChanged = true;
   }
@@ -42,7 +42,6 @@ const SCALE = 60;
 const Canvas = ({ width, height }: CanvasProps) => {
   const canvasRef = useRef();
   const canvasRefBase = useRef();
-
   const timeoutId = useRef();
 
   const [isPainting, setIsPainting] = useState(false);
@@ -237,27 +236,11 @@ const Canvas = ({ width, height }: CanvasProps) => {
 
   return (
     <>
-      <div style={{ marginLeft: "15rem", fontSize: "2rem" }}>{message}</div>
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          height: height,
-          width: width,
-        }}
-      >
+      <div className="message">{message}</div>
+      <div className="fullScreen">
         <canvas ref={canvasRefBase} height={height} width={width} />
       </div>
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          height: height,
-          width: width,
-        }}
-      >
+      <div className="fullScreen">
         <canvas ref={canvasRef} height={height} width={width} />
       </div>
     </>
