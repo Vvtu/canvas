@@ -121,11 +121,20 @@ const Canvas = ({ width, height }: CanvasProps) => {
     canvas.addEventListener("mousemove", updateLineWithNewCoordinates);
     canvas.addEventListener("mouseup", mouseUp);
     // canvas.addEventListener("mouseleave", mouseDown);
+
+    canvas.addEventListener("touchstart", mouseDown);
+    canvas.addEventListener("touchend", mouseUp);
+    // canvas.addEventListener("touchcancel", handleCancel, false);
+    canvas.addEventListener("touchmove", updateLineWithNewCoordinates);
+
     return () => {
       canvas.removeEventListener("mousedown", mouseDown);
       canvas.removeEventListener("mousemove", updateLineWithNewCoordinates);
       canvas.removeEventListener("mouseup", mouseUp);
-      // canvas.removeEventListener("mouseleave", mouseDown);
+
+      canvas.removeEventListener("touchstart", mouseDown);
+      canvas.removeEventListener("touchend", mouseUp);
+      canvas.removeEventListener("touchmove", updateLineWithNewCoordinates);
     };
   });
 
@@ -215,7 +224,7 @@ const Canvas = ({ width, height }: CanvasProps) => {
       context.closePath();
       context.stroke();
 
-      context.font = "1.5rem sans-serif";
+      context.font = "30px serif";
 
       context.fillStyle = "red";
       context.fillText(
