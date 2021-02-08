@@ -142,9 +142,9 @@ const Canvas = ({ width, height }: CanvasProps) => {
       contextBase.beginPath();
 
       const lines = Math.round(
-        Math.max(canvasBase.height, canvasBase.width) / SCALE
+        Math.max(canvasBase.height, canvasBase.width) / SCALE / 2
       );
-
+      console.log("lines = ", lines); //TODO vvtu, need to delete
       for (let x = -lines; x < lines; x += 1) {
         const from = toReal({ x, y: 0 });
         const to = toReal({ x, y: 0 });
@@ -163,15 +163,27 @@ const Canvas = ({ width, height }: CanvasProps) => {
       contextBase.strokeStyle = COLOR.ordinates;
       contextBase.lineWidth = 1;
       contextBase.beginPath();
+      // x
       const from = toReal({ x: -lines, y: 0 });
       const to = toReal({ x: lines, y: 0 });
       contextBase.moveTo(from.x, from.y);
       contextBase.lineTo(to.x, to.y);
-
+      // arrow x
+      contextBase.moveTo(canvasBase.width - 15, to.y - 3);
+      contextBase.lineTo(canvasBase.width - 2, to.y);
+      contextBase.moveTo(canvasBase.width - 15, to.y + 3);
+      contextBase.lineTo(canvasBase.width - 2, to.y);
+      // y
       const from2 = toReal({ x: 0, y: -lines });
       const to2 = toReal({ x: 0, y: lines });
       contextBase.moveTo(from2.x, from2.y);
       contextBase.lineTo(to2.x, to2.y);
+      // arrow y
+      contextBase.moveTo(to2.x - 3, 15);
+      contextBase.lineTo(to2.x, 2);
+      contextBase.moveTo(to2.x + 3, 15);
+      contextBase.lineTo(to2.x, 2);
+      //
       contextBase.closePath();
       contextBase.stroke();
     }
