@@ -112,12 +112,12 @@ const Canvas = ({ width, height }: CanvasProps) => {
       return;
     }
     const canvasBase: HTMLCanvasElement = canvasRefBase.current;
-    const contextBase = canvasBase.getContext("2d");
-    if (contextBase) {
-      contextBase.strokeStyle = COLOR.base;
-      contextBase.lineWidth = 1;
+    const coordinatesGridRef = canvasBase.getContext("2d");
+    if (coordinatesGridRef) {
+      coordinatesGridRef.strokeStyle = COLOR.base;
+      coordinatesGridRef.lineWidth = 1;
 
-      contextBase.beginPath();
+      coordinatesGridRef.beginPath();
 
       const lines = Math.round(
         Math.max(canvasBase.height, canvasBase.width) / SCALE / 2
@@ -125,44 +125,44 @@ const Canvas = ({ width, height }: CanvasProps) => {
       for (let x = -lines; x < lines; x += 1) {
         const from = toReal({ x, y: 0 });
         const to = toReal({ x, y: 0 });
-        contextBase.moveTo(from.x, 0);
-        contextBase.lineTo(to.x, canvasBase.height);
+        coordinatesGridRef.moveTo(from.x, 0);
+        coordinatesGridRef.lineTo(to.x, canvasBase.height);
       }
       for (let y = -lines; y < lines; y += 1) {
         const from = toReal({ x: 0, y });
         const to = toReal({ x: 0, y });
-        contextBase.moveTo(0, from.y);
-        contextBase.lineTo(canvasBase.width, to.y);
+        coordinatesGridRef.moveTo(0, from.y);
+        coordinatesGridRef.lineTo(canvasBase.width, to.y);
       }
-      contextBase.closePath();
-      contextBase.stroke();
+      coordinatesGridRef.closePath();
+      coordinatesGridRef.stroke();
 
-      contextBase.strokeStyle = COLOR.ordinates;
-      contextBase.lineWidth = 1;
-      contextBase.beginPath();
+      coordinatesGridRef.strokeStyle = COLOR.ordinates;
+      coordinatesGridRef.lineWidth = 1;
+      coordinatesGridRef.beginPath();
       // x
       const from = toReal({ x: -lines, y: 0 });
       const to = toReal({ x: lines, y: 0 });
-      contextBase.moveTo(from.x, from.y);
-      contextBase.lineTo(to.x, to.y);
+      coordinatesGridRef.moveTo(from.x, from.y);
+      coordinatesGridRef.lineTo(to.x + 10, to.y);
       // arrow x
-      contextBase.moveTo(canvasBase.width - 15, to.y - 3);
-      contextBase.lineTo(canvasBase.width - 2, to.y);
-      contextBase.moveTo(canvasBase.width - 15, to.y + 3);
-      contextBase.lineTo(canvasBase.width - 2, to.y);
+      coordinatesGridRef.moveTo(canvasBase.width - 15, to.y - 3);
+      coordinatesGridRef.lineTo(canvasBase.width - 2, to.y);
+      coordinatesGridRef.moveTo(canvasBase.width - 15, to.y + 3);
+      coordinatesGridRef.lineTo(canvasBase.width - 2, to.y);
       // y
       const from2 = toReal({ x: 0, y: -lines });
       const to2 = toReal({ x: 0, y: lines });
-      contextBase.moveTo(from2.x, from2.y);
-      contextBase.lineTo(to2.x, to2.y);
+      coordinatesGridRef.moveTo(from2.x, from2.y);
+      coordinatesGridRef.lineTo(to2.x, to2.y);
       // arrow y
-      contextBase.moveTo(to2.x - 3, 15);
-      contextBase.lineTo(to2.x, 2);
-      contextBase.moveTo(to2.x + 3, 15);
-      contextBase.lineTo(to2.x, 2);
+      coordinatesGridRef.moveTo(to2.x - 3, 15);
+      coordinatesGridRef.lineTo(to2.x, 2);
+      coordinatesGridRef.moveTo(to2.x + 3, 15);
+      coordinatesGridRef.lineTo(to2.x, 2);
       //
-      contextBase.closePath();
-      contextBase.stroke();
+      coordinatesGridRef.closePath();
+      coordinatesGridRef.stroke();
     }
   }, [toReal]);
 
@@ -215,12 +215,12 @@ const Canvas = ({ width, height }: CanvasProps) => {
 
       context.fillStyle = "red";
       context.fillText(
-        `(${fixedValue(point1.x)}, ${fixedValue(point1.y)} )`,
+        `(${fixedValue(point1.x)} ; ${fixedValue(point1.y)} )`,
         from.x + 15,
         from.y - 5
       );
       context.fillText(
-        `(${fixedValue(point2.x)}, ${fixedValue(point2.y)} )`,
+        `(${fixedValue(point2.x)} ; ${fixedValue(point2.y)} )`,
         to.x + 15,
         to.y - 5
       );

@@ -13,7 +13,7 @@ export const distance = (a: ICoordinate, b: ICoordinate) =>
   Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 
 export const fixedValue = (x: number) =>
-  Number.isInteger(x) ? x.toFixed(1) : x.toFixed(2);
+  Number.isInteger(x) ? x.toFixed(0) : x.toFixed(2);
 
 export const roundPointValue = (point: ICoordinate) => {
   const p1 = { ...point };
