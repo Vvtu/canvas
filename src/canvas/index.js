@@ -48,6 +48,7 @@ const Canvas = ({ width, height }: CanvasProps) => {
 
   const [point3, setPoint3] = useState({ x: 0, y: -2 });
   const [point4, setPoint4] = useState({ x: 4, y: 2 });
+  const [twoLineIntersection, setTwoLineIntersection] = useState({});
 
   const toReal = useCallback(
     ({ x, y }: ICoordinate) => ({
@@ -282,23 +283,44 @@ const Canvas = ({ width, height }: CanvasProps) => {
       }
       drawLine(point1, point2, COLOR.line1);
       drawLine(point3, point4, COLOR.line2);
+      const intersec = intersectionPoint(
+        { p1: point1, p2: point2 },
+        { p1: point3, p2: point4 }
+      );
+
+      setTwoLineIntersection(intersec);
+      if (intersec.x !== undefined) {
+        const inter = toReal(intersec);
+
+        context.strokeStyle = "grey";
+        context.lineWidth = 3;
+        context.beginPath();
+        context.moveTo(inter.x, inter.y);
+        context.arc(inter.x, inter.y, 3, 0, Math.PI * 2, true);
+        context.fillStyle = "black";
+        context.fillText(
+          `(${fixedValue(intersec.x)} ; ${fixedValue(intersec.y)} )`,
+          inter.x + 15,
+          inter.y - 5
+        );
+        context.closePath();
+        context.stroke();
+      }
     }
   }, [point1, point2, point3, point4, toReal]);
 
-  const twoLineIntersection = intersectionPoint(
-    { p1: point1, p2: point2 },
-    { p1: point3, p2: point4 }
-  );
-  console.log(
-    "%c twoLineIntersection = ",
-    "color: #bada55",
-    twoLineIntersection
-  ); //TODO - delete vvtu
   return (
     <>
       <div className="message">
         <div style={{ color: COLOR.line1 }}> {calcMessage(point1, point2)}</div>
         <div style={{ color: COLOR.line2 }}> {calcMessage(point3, point4)}</div>
+        <div style={{ color: "grey" }}>
+          {twoLineIntersection.x === undefined
+            ? "∅ ( прямые паралельны )"
+            : `точка пересечения (${fixedValue(
+                twoLineIntersection.x
+              )} ; ${fixedValue(twoLineIntersection.y)} )`}
+        </div>
       </div>
       <div className="fullScreen">
         <canvas ref={canvasRefBase} height={height} width={width} />
