@@ -46,6 +46,9 @@ const Canvas = ({ width, height }: CanvasProps) => {
   const [point1, setPoint1] = useState({ x: -2, y: -2 });
   const [point2, setPoint2] = useState({ x: 2, y: 2 });
 
+  const [point3, setPoint3] = useState({ x: 0, y: -2 });
+  const [point4, setPoint4] = useState({ x: 4, y: 2 });
+
   const toReal = useCallback(
     ({ x, y }: ICoordinate) => ({
       x: x * SCALE + width / 2,
@@ -84,15 +87,39 @@ const Canvas = ({ width, height }: CanvasProps) => {
       x: event.pageX - canvas.offsetLeft,
       y: event.pageY - canvas.offsetTop,
     });
-    const d1 = distance(coordinate, point1);
-    const d2 = distance(coordinate, point2);
-    if (d1 < d2 && d1 < 1.0) {
-      setPoint1(coordinate);
-    } else {
-      if (d2 < d1 && d2 < 1.0) {
-        setPoint2(coordinate);
+    let indexMin = 0;
+    const dist = [
+      distance(coordinate, point1),
+      distance(coordinate, point2),
+      distance(coordinate, point3),
+      distance(coordinate, point4),
+    ];
+
+    dist.forEach((d, index) => {
+      if (d < dist[indexMin]) {
+        indexMin = index;
+      }
+    });
+
+    if (dist[indexMin] < 1.0) {
+      switch (indexMin) {
+        case 0:
+          setPoint1(coordinate);
+          break;
+        case 1:
+          setPoint2(coordinate);
+          break;
+        case 2:
+          setPoint3(coordinate);
+          break;
+        case 3:
+          setPoint4(coordinate);
+          break;
+        default:
+          break;
       }
     }
+
     if (timeoutId.current) {
       clearTimeout(timeoutId.current);
     }
@@ -100,6 +127,8 @@ const Canvas = ({ width, height }: CanvasProps) => {
     timeoutId.current = setTimeout(() => {
       setPoint1(roundPointValue(point1));
       setPoint2(roundPointValue(point2));
+      setPoint3(roundPointValue(point3));
+      setPoint4(roundPointValue(point4));
     }, 300);
   };
 
@@ -196,64 +225,80 @@ const Canvas = ({ width, height }: CanvasProps) => {
     if (context) {
       context.clearRect(0, 0, canvas.width, canvas.height);
 
-      context.strokeStyle = COLOR.line1;
-      context.lineWidth = 3;
-      context.beginPath();
+      function drawLine(
+        startPoint: ICoordinate,
+        endPoint: ICoordinate,
+        color: string
+      ) {
+        context.strokeStyle = color;
+        context.lineWidth = 3;
+        context.beginPath();
 
-      const from = toReal(point1);
-      const to = toReal(point2);
+        const from = toReal(startPoint);
+        const to = toReal(endPoint);
 
-      context.moveTo(from.x, from.y);
-      context.arc(from.x, from.y, 3, 0, Math.PI * 2, true);
-      context.moveTo(to.x, to.y);
-      context.arc(to.x, to.y, 3, 0, Math.PI * 2, true);
+        context.moveTo(from.x, from.y);
+        context.arc(from.x, from.y, 3, 0, Math.PI * 2, true);
+        context.moveTo(to.x, to.y);
+        context.arc(to.x, to.y, 3, 0, Math.PI * 2, true);
 
-      let p1 = intersectionPoint(
-        { p1: from, p2: to },
-        { p1: { x: 0, y: 0 }, p2: { x: 0, y: canvas.height } }
-      );
-      let p2 = intersectionPoint(
-        { p1: from, p2: to },
-        {
-          p1: { x: canvas.width, y: 0 },
-          p2: { x: canvas.width, y: canvas.height },
+        let p1 = intersectionPoint(
+          { p1: from, p2: to },
+          { p1: { x: 0, y: 0 }, p2: { x: 0, y: canvas.height } }
+        );
+        let p2 = intersectionPoint(
+          { p1: from, p2: to },
+          {
+            p1: { x: canvas.width, y: 0 },
+            p2: { x: canvas.width, y: canvas.height },
+          }
+        );
+
+        if (p1.x === undefined || p2.x === undefined) {
+          // прямая расположена вертикально
+          p1 = { x: from.x, y: 0 };
+          p2 = { x: from.x, y: canvas.height };
         }
-      );
 
-      if (p1.x === undefined || p2.x === undefined) {
-        // прямая расположена вертикально
-        p1 = { x: from.x, y: 0 };
-        p2 = { x: from.x, y: canvas.height };
+        context.moveTo(p1.x, p1.y);
+        context.lineTo(p2.x, p2.y);
+
+        context.closePath();
+        context.stroke();
+
+        context.font = "30px serif";
+
+        context.fillStyle = color;
+        context.fillText(
+          `(${fixedValue(startPoint.x)} ; ${fixedValue(startPoint.y)} )`,
+          from.x + 15,
+          from.y - 5
+        );
+        context.fillText(
+          `(${fixedValue(endPoint.x)} ; ${fixedValue(endPoint.y)} )`,
+          to.x + 15,
+          to.y - 5
+        );
       }
-
-      context.moveTo(p1.x, p1.y);
-      context.lineTo(p2.x, p2.y);
-
-      context.closePath();
-      context.stroke();
-
-      context.font = "30px serif";
-
-      context.fillStyle = "red";
-      context.fillText(
-        `(${fixedValue(point1.x)} ; ${fixedValue(point1.y)} )`,
-        from.x + 15,
-        from.y - 5
-      );
-      context.fillText(
-        `(${fixedValue(point2.x)} ; ${fixedValue(point2.y)} )`,
-        to.x + 15,
-        to.y - 5
-      );
+      drawLine(point1, point2, COLOR.line1);
+      drawLine(point3, point4, COLOR.line2);
     }
-  }, [point1, point2, toReal]);
+  }, [point1, point2, point3, point4, toReal]);
 
-  const message = calcMessage(point1, point2);
-
+  const twoLineIntersection = intersectionPoint(
+    { p1: point1, p2: point2 },
+    { p1: point3, p2: point4 }
+  );
+  console.log(
+    "%c twoLineIntersection = ",
+    "color: #bada55",
+    twoLineIntersection
+  ); //TODO - delete vvtu
   return (
     <>
-      <div className="message" style={{ color: COLOR.line1 }}>
-        {message}
+      <div className="message">
+        <div style={{ color: COLOR.line1 }}> {calcMessage(point1, point2)}</div>
+        <div style={{ color: COLOR.line2 }}> {calcMessage(point3, point4)}</div>
       </div>
       <div className="fullScreen">
         <canvas ref={canvasRefBase} height={height} width={width} />
