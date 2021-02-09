@@ -15,6 +15,27 @@ interface CanvasProps {
 
 const SCALE = 60;
 
+const calcMessage = (point1: ICoordinate, point2: ICoordinate) => {
+  const dx = point2.x - point1.x;
+  const dy = point2.y - point1.y;
+
+  let message;
+  if (dx === 0 && dy === 0) {
+    message = "точки совпадают";
+  } else {
+    if (dx === 0) {
+      message = "k = ∞";
+    } else {
+      const k = dy / dx;
+      const b = -point1.x * k + point1.y;
+      message = `y = ${fixedValue(k)} * x${
+        b === 0 ? "" : ` ${b > 0 ? "+" : ""} ${fixedValue(b)}`
+      }`;
+    }
+  }
+  return message;
+};
+
 const Canvas = ({ width, height }: CanvasProps) => {
   const canvasRef = useRef();
   const canvasRefBase = useRef();
@@ -175,7 +196,7 @@ const Canvas = ({ width, height }: CanvasProps) => {
     if (context) {
       context.clearRect(0, 0, canvas.width, canvas.height);
 
-      context.strokeStyle = COLOR.line;
+      context.strokeStyle = COLOR.line1;
       context.lineWidth = 3;
       context.beginPath();
 
@@ -227,27 +248,13 @@ const Canvas = ({ width, height }: CanvasProps) => {
     }
   }, [point1, point2, toReal]);
 
-  const dx = point2.x - point1.x;
-  const dy = point2.y - point1.y;
-
-  let message;
-  if (dx === 0 && dy === 0) {
-    message = "точки совпадают";
-  } else {
-    if (dx === 0) {
-      message = "k = ∞";
-    } else {
-      const k = dy / dx;
-      const b = -point1.x * k + point1.y;
-      message = `y = ${fixedValue(k)} * x${
-        b === 0 ? "" : ` ${b > 0 ? "+" : ""} ${fixedValue(b)}`
-      }`;
-    }
-  }
+  const message = calcMessage(point1, point2);
 
   return (
     <>
-      <div className="message">{message}</div>
+      <div className="message" style={{ color: COLOR.line1 }}>
+        {message}
+      </div>
       <div className="fullScreen">
         <canvas ref={canvasRefBase} height={height} width={width} />
       </div>

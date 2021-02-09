@@ -1,5 +1,5 @@
 export const COLOR = {
-  line: "red",
+  line1: "red",
   base: "#ddd",
   ordinates: "#000",
 };
