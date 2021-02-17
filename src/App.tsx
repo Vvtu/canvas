@@ -2,11 +2,14 @@ import Canvas from "./canvas";
 import "./App.css";
 
 import { useLayoutEffect, useRef, useState } from "react";
+const SCALE_MULTIPLIER = 1.2;
+const INITIAL_SCALE_VALUE = 60;
 
 function App() {
   const ref = useRef<any>();
   const timeoutId = useRef<any>();
   const [screenSize, setScreenSize] = useState({ width: 600, height: 600 });
+  const [scale, setScale] = useState(INITIAL_SCALE_VALUE);
 
   function updateSize() {
     if (timeoutId.current) {
@@ -33,7 +36,27 @@ function App() {
 
   return (
     <div className="App fullScreen" ref={ref}>
-      <Canvas width={screenSize.width} height={screenSize.height} />
+      <Canvas
+        width={screenSize.width}
+        height={screenSize.height}
+        scale={scale}
+      />
+      <div
+        className="scaleButton1"
+        onClick={() => {
+          setScale(scale * SCALE_MULTIPLIER);
+        }}
+      >
+        +
+      </div>
+      <div
+        className="scaleButton2"
+        onClick={() => {
+          setScale(scale / SCALE_MULTIPLIER);
+        }}
+      >
+        &minus;
+      </div>
     </div>
   );
 }

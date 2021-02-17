@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, Profiler } from "react";
 
 import {
   COLOR,
@@ -11,9 +11,8 @@ import {
 interface CanvasProps {
   width: number;
   height: number;
+  scale: number;
 }
-
-const SCALE = 60;
 
 const calcMessage = (point1: ICoordinate, point2: ICoordinate) => {
   const dx = point2.x - point1.x;
@@ -36,7 +35,7 @@ const calcMessage = (point1: ICoordinate, point2: ICoordinate) => {
   return message;
 };
 
-const Canvas = ({ width, height }: CanvasProps) => {
+const Canvas = ({ width, height, scale }: CanvasProps) => {
   const canvasRef = useRef();
   const canvasRefBase = useRef();
   const timeoutId = useRef();
@@ -52,17 +51,17 @@ const Canvas = ({ width, height }: CanvasProps) => {
 
   const toReal = useCallback(
     ({ x, y }: ICoordinate) => ({
-      x: x * SCALE + width / 2,
-      y: -y * SCALE + height / 2,
+      x: x * scale + width / 2,
+      y: -y * scale + height / 2,
     }),
-    [height, width]
+    [height, width, scale]
   );
   const fromReal = useCallback(
     ({ x, y }: ICoordinate) => ({
-      x: (x - width / 2) / SCALE,
-      y: -(y - height / 2) / SCALE,
+      x: (x - width / 2) / scale,
+      y: -(y - height / 2) / scale,
     }),
-    [height, width]
+    [height, width, scale]
   );
 
   useEffect(() => {
@@ -165,13 +164,15 @@ const Canvas = ({ width, height }: CanvasProps) => {
     const canvasBase: HTMLCanvasElement = canvasRefBase.current;
     const coordinatesGridRef = canvasBase.getContext("2d");
     if (coordinatesGridRef) {
+      coordinatesGridRef.clearRect(0, 0, canvasBase.width, canvasBase.height);
+
       coordinatesGridRef.strokeStyle = COLOR.base;
       coordinatesGridRef.lineWidth = 1;
 
       coordinatesGridRef.beginPath();
 
       const lines = Math.round(
-        Math.max(canvasBase.height, canvasBase.width) / SCALE / 2
+        Math.max(canvasBase.height, canvasBase.width) / scale / 2
       );
       for (let x = -lines; x < lines; x += 1) {
         const from = toReal({ x, y: 0 });
@@ -309,26 +310,36 @@ const Canvas = ({ width, height }: CanvasProps) => {
     }
   }, [point1, point2, point3, point4, toReal]);
 
+  const callback = (e) => {
+    console.log("%ccallback e = ", "color: #bada55", e); //TODO - delete vvtu
+  };
+
   return (
-    <>
-      <div className="message">
-        <div style={{ color: COLOR.line1 }}> {calcMessage(point1, point2)}</div>
-        <div style={{ color: COLOR.line2 }}> {calcMessage(point3, point4)}</div>
-        <div style={{ color: "grey" }}>
-          {twoLineIntersection.x === undefined
-            ? "∅ ( прямые паралельны )"
-            : `точка пересечения (${fixedValue(
-                twoLineIntersection.x
-              )} ; ${fixedValue(twoLineIntersection.y)} )`}
+    <Profiler id="Navigation" onRender={callback}>
+      <>
+        <div className="fullScreen">
+          <canvas ref={canvasRefBase} height={height} width={width} />
         </div>
-      </div>
-      <div className="fullScreen">
-        <canvas ref={canvasRefBase} height={height} width={width} />
-      </div>
-      <div className="fullScreen">
-        <canvas ref={canvasRef} height={height} width={width} />
-      </div>
-    </>
+        <div className="fullScreen">
+          <canvas ref={canvasRef} height={height} width={width} />
+        </div>
+        <div className="message">
+          <div style={{ color: COLOR.line1 }}>
+            {calcMessage(point1, point2)}
+          </div>
+          <div style={{ color: COLOR.line2 }}>
+            {calcMessage(point3, point4)}
+          </div>
+          <div style={{ color: "grey" }}>
+            {twoLineIntersection.x === undefined
+              ? "∅ ( прямые паралельны )"
+              : `точка пересечения (${fixedValue(
+                  twoLineIntersection.x
+                )} ; ${fixedValue(twoLineIntersection.y)} )`}
+          </div>
+        </div>
+      </>
+    </Profiler>
   );
 };
 
