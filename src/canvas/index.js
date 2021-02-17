@@ -310,12 +310,43 @@ const Canvas = ({ width, height, scale }: CanvasProps) => {
     }
   }, [point1, point2, point3, point4, toReal]);
 
-  const callback = (e) => {
-    console.log("%ccallback e = ", "color: #bada55", e); //TODO - delete vvtu
-  };
+  function onRenderCallback(
+    id, // the "id" prop of the Profiler tree that has just committed
+    phase, // either "mount" (if the tree just mounted) or "update" (if it re-rendered)
+    actualDuration, // time spent rendering the committed update
+    baseDuration, // estimated time to render the entire subtree without memoization
+    startTime, // when React began rendering this update
+    commitTime, // when React committed this update
+    interactions // the Set of interactions belonging to this update
+  ) {
+    // Aggregate or log render timings...
+    console.log("%conRenderCallback id = ", "color: #bada55", id); //TODO - delete vvtu
+    console.log("%conRenderCallback phase = ", "color: #bada55", phase); //TODO - delete vvtu
+    console.log(
+      "%conRenderCallback actualDuration = ",
+      "color: #bada55",
+      actualDuration
+    ); //TODO - delete vvtu
+    console.log(
+      "%conRenderCallback baseDuration = ",
+      "color: #bada55",
+      baseDuration
+    ); //TODO - delete vvtu
+    console.log("%conRenderCallback startTime = ", "color: #bada55", startTime); //TODO - delete vvtu
+    console.log(
+      "%conRenderCallback commitTime = ",
+      "color: #bada55",
+      commitTime
+    ); //TODO - delete vvtu
+    console.log(
+      "%conRenderCallback interactions = ",
+      "color: #bada55",
+      interactions
+    ); //TODO - delete vvtu
+  }
 
   return (
-    <Profiler id="Navigation" onRender={callback}>
+    <Profiler id="Navigation" onRender={onRenderCallback}>
       <>
         <div className="fullScreen">
           <canvas ref={canvasRefBase} height={height} width={width} />
