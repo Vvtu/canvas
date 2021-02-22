@@ -2,7 +2,6 @@ import Routes from "./Routes";
 import "./App.css";
 
 import { useLayoutEffect, useRef, useState } from "react";
-const SCALE_MULTIPLIER = 1.2;
 const INITIAL_SCALE_VALUE = 60;
 
 function App() {
@@ -40,23 +39,11 @@ function App() {
         width={screenSize.width}
         height={screenSize.height}
         scale={scale}
+        setScale={(a) => {
+          setScale(a);
+          console.log("%c a = ", "color: #bada55", a); //TODO - delete vvtu
+        }}
       />
-      <div
-        className="scaleButton1"
-        onClick={() => {
-          setScale(scale * SCALE_MULTIPLIER);
-        }}
-      >
-        +
-      </div>
-      <div
-        className="scaleButton2"
-        onClick={() => {
-          setScale(scale / SCALE_MULTIPLIER);
-        }}
-      >
-        &minus;
-      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, Profiler } from "react";
 import CoordinateGrid from "./CoordinateGrid";
+import ScaleButtons from "./ScaleButtons";
 
 import {
   COLOR,
@@ -33,7 +34,9 @@ const calcMessage = (point1: ICoordinate, point2: ICoordinate) => {
   return message;
 };
 
-const Canvas = ({ width, height, scale }: ICanvasProps) => {
+const Canvas = (props: ICanvasProps) => {
+  const { width, height, scale } = props;
+
   const canvasRef = useRef();
   const timeoutId = useRef();
 
@@ -255,6 +258,7 @@ const Canvas = ({ width, height, scale }: ICanvasProps) => {
     commitTime, // when React committed this update
     interactions // the Set of interactions belonging to this update
   ) {
+    return;
     // Aggregate or log render timings...
     console.log("%conRenderCallback id = ", "color: #bada55", id); //TODO - delete vvtu
     console.log("%conRenderCallback phase = ", "color: #bada55", phase); //TODO - delete vvtu
@@ -284,7 +288,7 @@ const Canvas = ({ width, height, scale }: ICanvasProps) => {
   return (
     <Profiler id="Navigation" onRender={onRenderCallback}>
       <>
-        <CoordinateGrid {...{ width, height, scale }} />
+        <CoordinateGrid {...props} />
         <div className="fullScreen">
           <canvas ref={canvasRef} height={height} width={width} />
         </div>
@@ -303,6 +307,7 @@ const Canvas = ({ width, height, scale }: ICanvasProps) => {
                 )} ; ${fixedValue(twoLineIntersection.y)} )`}
           </div>
         </div>
+        <ScaleButtons {...props} />
       </>
     </Profiler>
   );
