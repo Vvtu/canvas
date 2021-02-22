@@ -2,8 +2,10 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { ICanvasProps } from "./canvas/types";
 
 import Lines from "./canvas/Lines";
+import Triangle from "./canvas/Triangle";
 
 const LINES = "/lines";
+const TRIANGLE = "/triangle";
 
 export default function Routes(props: ICanvasProps) {
   return (
@@ -11,6 +13,9 @@ export default function Routes(props: ICanvasProps) {
       <Switch>
         <Route path={LINES}>
           <Lines {...props} />
+        </Route>
+        <Route path={TRIANGLE}>
+          <Triangle {...props} />
         </Route>
         <Route path="/">
           <nav>
@@ -20,6 +25,9 @@ export default function Routes(props: ICanvasProps) {
               </li>
               <li>
                 <Link to={LINES}>Lines</Link>
+              </li>
+              <li>
+                <Link to={TRIANGLE}>Triangle</Link>
               </li>
             </ul>
           </nav>

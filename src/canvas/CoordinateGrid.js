@@ -4,7 +4,7 @@ import { COLOR, ICoordinate } from "../utils";
 
 import { ICanvasProps } from "./types";
 
-const CoordinateGrid = ({ width, height, scale }: ICanvasProps) => {
+export default function CoordinateGrid  ({ width, height, scale }: ICanvasProps) {
   const canvasCoordinateGridRef = useRef();
 
   const toReal = useCallback(
@@ -82,5 +82,3 @@ const CoordinateGrid = ({ width, height, scale }: ICanvasProps) => {
     </div>
   );
 };
-
-export default CoordinateGrid;

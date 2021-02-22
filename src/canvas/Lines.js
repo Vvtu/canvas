@@ -34,7 +34,7 @@ const calcMessage = (point1: ICoordinate, point2: ICoordinate) => {
   return message;
 };
 
-const Canvas = (props: ICanvasProps) => {
+export default function Lines(props: ICanvasProps) {
   const { width, height, scale } = props;
 
   const canvasRef = useRef();
@@ -291,6 +291,7 @@ const Canvas = (props: ICanvasProps) => {
         <CoordinateGrid {...props} />
         <div className="fullScreen">
           <canvas ref={canvasRef} height={height} width={width} />
+          <ScaleButtons {...props} />
         </div>
         <div className="message">
           <div style={{ color: COLOR.line1 }}>
@@ -307,10 +308,7 @@ const Canvas = (props: ICanvasProps) => {
                 )} ; ${fixedValue(twoLineIntersection.y)} )`}
           </div>
         </div>
-        <ScaleButtons {...props} />
       </>
     </Profiler>
   );
-};
-
-export default Canvas;
+}

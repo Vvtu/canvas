@@ -2,9 +2,9 @@ import { ICanvasProps } from "./types";
 
 const SCALE_MULTIPLIER = 1.2;
 
-const ScaleButtons = ({ scale, setScale }: ICanvasProps) => {
+export default function ScaleButtons({ scale, setScale }: ICanvasProps) {
   return (
-    <div className="fullScreen">
+    <>
       <div
         className="scaleButton1"
         onClick={() => {
@@ -21,8 +21,6 @@ const ScaleButtons = ({ scale, setScale }: ICanvasProps) => {
       >
         &minus;
       </div>
-    </div>
+    </>
   );
-};
-
-export default ScaleButtons;
+}
