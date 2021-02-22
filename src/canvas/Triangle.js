@@ -13,6 +13,12 @@ import {
 
 import { ICanvasProps } from "./types";
 
+const REAL_POINTS_BASE = [
+  { name: "A", prev: 2, next: 1 },
+  { name: "B", prev: 0, next: 2 },
+  { name: "C", prev: 1, next: 0 },
+];
+
 const calcMessage = (point1: ICoordinate, point2: ICoordinate) => {
   const dx = point2.x - point1.x;
   const dy = point2.y - point1.y;
@@ -45,7 +51,7 @@ export default function Triangle(props: ICanvasProps) {
   const [points, setPoints] = useState([
     { x: -2, y: -2 },
     { x: 2, y: 2 },
-    { x: 0, y: -2 },
+    { x: 0, y: -3 },
   ]);
 
   const toReal = useCallback(
@@ -96,7 +102,6 @@ export default function Triangle(props: ICanvasProps) {
         indexMin = index;
       }
     });
-    console.log("%c indexMin = ", "color: #bada55", indexMin); //TODO - delete vvtu
     if (distMin < 1.0) {
       const newPoints = [...points];
       newPoints[indexMin] = coordinate;
@@ -147,93 +152,119 @@ export default function Triangle(props: ICanvasProps) {
     if (context) {
       context.clearRect(0, 0, canvas.width, canvas.height);
 
-      context.strokeStyle = COLOR.base;
-      context.lineWidth = 1;
-      context.beginPath();
+      const realPoints = points.map((p, index) => ({
+        ...REAL_POINTS_BASE[index],
+        point: toReal(p),
+      }));
 
-      const realPoints = points.map((p) => ({ point: toReal(p) }));
-      console.log("%c realPoints = ", "color: #bada55", realPoints); //TODO - delete vvtu
-      // context.moveTo(realPoints[0].point.x, realPoints[0].point.y);
-      // context.arc(realPoints[0].point.x, realPoints[0].point.y, 3, 0, Math.PI * 2, true);
-      // context.moveTo(realPoints[1].point.x, realPoints[1].point.y);
-      // context.arc(realPoints[1].point.x, realPoints[1].point.y, 3, 0, Math.PI * 2, true);
-      // context.moveTo(realPoints[2].point.x, realPoints[2].point.y);
-      // context.arc(realPoints[2].point.x, realPoints[2].point.y, 3, 0, Math.PI * 2, true);
+      realPoints.forEach((p) => {
+        const pNext = realPoints[p.next].point;
+        const pPrev = realPoints[p.prev].point;
 
-      // context.closePath();
-      // context.stroke();
-      // context.lineWidth = 1;
-      // context.beginPath();
+        let p1 = intersectionPoint(
+          { p1: p.point, p2: pNext },
+          { p1: { x: 0, y: 0 }, p2: { x: 0, y: canvas.height } }
+        );
+        let p2 = intersectionPoint(
+          { p1: p.point, p2: pNext },
+          {
+            p1: { x: canvas.width, y: 0 },
+            p2: { x: canvas.width, y: canvas.height },
+          }
+        );
 
-      let p1 = intersectionPoint(
-        { p1: realPoints[0].point, p2: realPoints[1].point },
-        { p1: { x: 0, y: 0 }, p2: { x: 0, y: canvas.height } }
-      );
-      let p2 = intersectionPoint(
-        { p1: realPoints[0].point, p2: realPoints[1].point },
-        {
-          p1: { x: canvas.width, y: 0 },
-          p2: { x: canvas.width, y: canvas.height },
+        if (p1.x === undefined || p2.x === undefined) {
+          // прямая расположена вертикально
+          p1 = { x: p.point.x, y: 0 };
+          p2 = { x: p.point.x, y: canvas.height };
         }
-      );
+        context.strokeStyle = COLOR.base;
+        context.lineWidth = 1;
+        context.beginPath();
 
-      if (p1.x === undefined || p2.x === undefined) {
-        // прямая расположена вертикально
-        p1 = { x: realPoints[0].point.x, y: 0 };
-        p2 = { x: realPoints[0].point.x, y: canvas.height };
-      }
+        context.moveTo(p1.x, p1.y);
+        context.lineTo(p2.x, p2.y);
 
-      context.moveTo(p1.x, p1.y);
-      context.lineTo(p2.x, p2.y);
+        context.closePath();
+        context.stroke();
 
-      context.closePath();
-      context.stroke();
+        context.lineWidth = 3;
+        context.strokeStyle = COLOR.line1;
+        context.beginPath();
 
-      context.lineWidth = 3;
-      context.strokeStyle = COLOR.line1;
-      context.beginPath();
+        context.moveTo(p.point.x, p.point.y);
+        context.lineTo(pNext.x, pNext.y);
 
-      context.moveTo(realPoints[0].point.x, realPoints[0].point.y);
-      context.lineTo(realPoints[1].point.x, realPoints[1].point.y);
+        context.closePath();
+        context.stroke();
+        // медиана
+        const median = {
+          x: (pPrev.x + pNext.x) / 2,
+          y: (pPrev.y + pNext.y) / 2,
+        };
 
-      context.closePath();
-      context.stroke();
-      context.font = "30px serif";
+        context.lineWidth = 1;
+        context.strokeStyle = "blue";
+        context.beginPath();
 
-      context.fillStyle = COLOR.line1;
-      context.fillText(
-        "A",
-        realPoints[0].point.x + 15,
-        realPoints[0].point.y - 5
-      );
-      // }
-      // drawLine(point1, point2, COLOR.base);
-      // drawLine(point2, point3, COLOR.base);
-      // drawLine(point3, point1, COLOR.base);
+        context.moveTo(p.point.x, p.point.y);
+        context.lineTo(median.x, median.y);
 
-      // const intersec = intersectionPoint(
-      //   { p1: point1, p2: point2 },
-      //   { p1: point3, p2: point4 }
-      // );
+        context.closePath();
+        context.stroke();
 
-      // setTwoLineIntersection(intersec);
-      // if (intersec.x !== undefined) {
-      //   const inter = toReal(intersec);
+        // бисектрисса
+        const atanBisectrissa1 = Math.atan2(
+          pPrev.y - p.point.y,
+          pPrev.x - p.point.x
+        );
+        const atanBisectrissa2 = Math.atan2(
+          pNext.y - p.point.y,
+          pNext.x - p.point.x
+        );
 
-      //   context.strokeStyle = "grey";
-      //   context.lineWidth = 3;
-      //   context.beginPath();
-      //   context.moveTo(inter.x, inter.y);
-      //   context.arc(inter.x, inter.y, 3, 0, Math.PI * 2, true);
-      //   context.fillStyle = "black";
-      //   context.fillText(
-      //     `(${fixedValue(intersec.x)} ; ${fixedValue(intersec.y)} )`,
-      //     inter.x + 15,
-      //     inter.y - 5
-      //   );
-      //   context.closePath();
-      //   context.stroke();
-      // }
+        const atanBi = (atanBisectrissa1 + atanBisectrissa2) / 2;
+
+        const b1 = intersectionPoint(
+          { p1: pNext, p2: pPrev },
+          {
+            p1: p.point,
+            p2: {
+              x: p.point.x + Math.cos(atanBi),
+              y: p.point.y + Math.sin(atanBi),
+            },
+          }
+        );
+        let letterCoorditate = {
+          x: p.point.x - 30 * Math.cos(atanBi),
+          y: p.point.y - 30 * Math.sin(atanBi),
+        };
+
+        const di = distance(p.point, b1);
+        const diLetter = distance(letterCoorditate, b1);
+        if (di > diLetter) {
+          letterCoorditate = {
+            x: p.point.x + 30 * Math.cos(atanBi),
+            y: p.point.y + 30 * Math.sin(atanBi),
+          };
+        }
+
+        context.font = "30px serif";
+        context.fillStyle = COLOR.line1;
+        context.fillText(
+          p.name,
+          letterCoorditate.x - 10,
+          letterCoorditate.y + 7
+        );
+
+        context.lineWidth = 1;
+        context.strokeStyle = "green";
+        context.beginPath();
+        context.moveTo(p.point.x, p.point.y);
+        context.lineTo(b1.x, b1.y);
+        context.closePath();
+        context.stroke();
+      });
     }
   }, [points, toReal]);
 
