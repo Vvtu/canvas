@@ -210,7 +210,7 @@ export default function Triangle(props: ICanvasProps) {
         };
 
         context.lineWidth = 1;
-        context.strokeStyle = "blue";
+        context.strokeStyle = "#004";
         context.beginPath();
 
         context.moveTo(p.point.x, p.point.y);
@@ -297,13 +297,14 @@ export default function Triangle(props: ICanvasProps) {
         });
 
         context.lineWidth = 1;
-        context.strokeStyle = "black";
+        context.strokeStyle = "#777";
         context.beginPath();
         context.moveTo(p.point.x, p.point.y);
         context.lineTo(heightPoint.x, heightPoint.y);
         context.closePath();
         context.stroke();
       });
+      // inCenterArc
       const inCenterPoint = intersectionPoint(bisectrArr[0], bisectrArr[1]);
       const trianglePerimeter =
         (triangleSides[0] + triangleSides[1] + triangleSides[2]) / 2;
@@ -321,6 +322,27 @@ export default function Triangle(props: ICanvasProps) {
         inCenterPoint.x,
         inCenterPoint.y,
         inCenterRadius,
+        0,
+        Math.PI * 2,
+        true
+      );
+      context.closePath();
+      context.stroke();
+
+      // outCenterArc
+      const outCenterPoint = intersectionPoint(
+        seredPerpenArr[0],
+        seredPerpenArr[1]
+      );
+      const outCenterRadius = distance(outCenterPoint, realPoints[0].point);
+      context.lineWidth = 1;
+      context.strokeStyle = "brown";
+      context.beginPath();
+      context.moveTo(outCenterPoint.x + outCenterRadius, outCenterPoint.y);
+      context.arc(
+        outCenterPoint.x,
+        outCenterPoint.y,
+        outCenterRadius,
         0,
         Math.PI * 2,
         true
