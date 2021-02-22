@@ -157,9 +157,15 @@ export default function Triangle(props: ICanvasProps) {
         point: toReal(p),
       }));
 
+      const bisectrArr = [];
+      const triangleSides = [];
+      const seredPerpenArr = [];
+
       realPoints.forEach((p) => {
         const pNext = realPoints[p.next].point;
         const pPrev = realPoints[p.prev].point;
+
+        triangleSides.push(distance(pNext, pPrev));
 
         let p1 = intersectionPoint(
           { p1: p.point, p2: pNext },
@@ -235,6 +241,7 @@ export default function Triangle(props: ICanvasProps) {
             },
           }
         );
+        bisectrArr.push({ p1: p.point, p2: bisectrPoint });
         context.lineWidth = 1;
         context.strokeStyle = "green";
         context.beginPath();
@@ -281,6 +288,14 @@ export default function Triangle(props: ICanvasProps) {
           }
         );
 
+        seredPerpenArr.push({
+          p1: median,
+          p2: {
+            x: median.x + Math.cos(atanHeight),
+            y: median.y + Math.sin(atanHeight),
+          },
+        });
+
         context.lineWidth = 1;
         context.strokeStyle = "black";
         context.beginPath();
@@ -289,6 +304,29 @@ export default function Triangle(props: ICanvasProps) {
         context.closePath();
         context.stroke();
       });
+      const inCenterPoint = intersectionPoint(bisectrArr[0], bisectrArr[1]);
+      const trianglePerimeter =
+        (triangleSides[0] + triangleSides[1] + triangleSides[2]) / 2;
+      const inCenterRadius = Math.sqrt(
+        ((trianglePerimeter - triangleSides[0]) *
+          (trianglePerimeter - triangleSides[1]) *
+          (trianglePerimeter - triangleSides[2])) /
+          trianglePerimeter
+      );
+      context.lineWidth = 1;
+      context.strokeStyle = "brown";
+      context.beginPath();
+      context.moveTo(inCenterPoint.x + inCenterRadius, inCenterPoint.y);
+      context.arc(
+        inCenterPoint.x,
+        inCenterPoint.y,
+        inCenterRadius,
+        0,
+        Math.PI * 2,
+        true
+      );
+      context.closePath();
+      context.stroke();
     }
   }, [points, toReal]);
 
