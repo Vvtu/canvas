@@ -39,10 +39,7 @@ function App() {
         width={screenSize.width}
         height={screenSize.height}
         scale={scale}
-        setScale={(a) => {
-          setScale(a);
-          console.log("%c a = ", "color: #bada55", a); //TODO - delete vvtu
-        }}
+        setScale={setScale}
       />
     </div>
   );

@@ -188,7 +188,7 @@ export default function Triangle(props: ICanvasProps) {
         context.closePath();
         context.stroke();
 
-        context.lineWidth = 3;
+        context.lineWidth = 4;
         context.strokeStyle = COLOR.line1;
         context.beginPath();
 
@@ -225,7 +225,7 @@ export default function Triangle(props: ICanvasProps) {
 
         const atanBi = (atanBisectrissa1 + atanBisectrissa2) / 2;
 
-        const b1 = intersectionPoint(
+        const bisectrPoint = intersectionPoint(
           { p1: pNext, p2: pPrev },
           {
             p1: p.point,
@@ -235,13 +235,22 @@ export default function Triangle(props: ICanvasProps) {
             },
           }
         );
+        context.lineWidth = 1;
+        context.strokeStyle = "green";
+        context.beginPath();
+        context.moveTo(p.point.x, p.point.y);
+        context.lineTo(bisectrPoint.x, bisectrPoint.y);
+        context.closePath();
+        context.stroke();
+
+        // БУКВА вершины
         let letterCoorditate = {
           x: p.point.x - 30 * Math.cos(atanBi),
           y: p.point.y - 30 * Math.sin(atanBi),
         };
 
-        const di = distance(p.point, b1);
-        const diLetter = distance(letterCoorditate, b1);
+        const di = distance(p.point, bisectrPoint);
+        const diLetter = distance(letterCoorditate, bisectrPoint);
         if (di > diLetter) {
           letterCoorditate = {
             x: p.point.x + 30 * Math.cos(atanBi),
@@ -257,11 +266,26 @@ export default function Triangle(props: ICanvasProps) {
           letterCoorditate.y + 7
         );
 
+        // высота
+        const atanHeight =
+          Math.atan2(pNext.y - pPrev.y, pNext.x - pPrev.x) + Math.PI / 2;
+
+        const heightPoint = intersectionPoint(
+          { p1: pNext, p2: pPrev },
+          {
+            p1: p.point,
+            p2: {
+              x: p.point.x + Math.cos(atanHeight),
+              y: p.point.y + Math.sin(atanHeight),
+            },
+          }
+        );
+
         context.lineWidth = 1;
-        context.strokeStyle = "green";
+        context.strokeStyle = "black";
         context.beginPath();
         context.moveTo(p.point.x, p.point.y);
-        context.lineTo(b1.x, b1.y);
+        context.lineTo(heightPoint.x, heightPoint.y);
         context.closePath();
         context.stroke();
       });
