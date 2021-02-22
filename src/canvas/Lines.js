@@ -8,11 +8,8 @@ import {
   roundPointValue,
   intersectionPoint,
 } from "../utils";
-interface CanvasProps {
-  width: number;
-  height: number;
-  scale: number;
-}
+
+import { ICanvasProps } from "./types";
 
 const calcMessage = (point1: ICoordinate, point2: ICoordinate) => {
   const dx = point2.x - point1.x;
@@ -35,7 +32,7 @@ const calcMessage = (point1: ICoordinate, point2: ICoordinate) => {
   return message;
 };
 
-const Canvas = ({ width, height, scale }: CanvasProps) => {
+const Canvas = ({ width, height, scale }: ICanvasProps) => {
   const canvasRef = useRef();
   const canvasRefBase = useRef();
   const timeoutId = useRef();

@@ -1,4 +1,4 @@
-import Canvas from "./canvas";
+import Routes from "./Routes";
 import "./App.css";
 
 import { useLayoutEffect, useRef, useState } from "react";
@@ -36,7 +36,7 @@ function App() {
 
   return (
     <div className="App fullScreen" ref={ref}>
-      <Canvas
+      <Routes
         width={screenSize.width}
         height={screenSize.height}
         scale={scale}
